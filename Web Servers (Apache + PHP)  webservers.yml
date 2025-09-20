@@ -1,0 +1,38 @@
+---
+- name: Setup Apache + PHP on Web Servers
+  hosts: web
+  become: yes
+
+  tasks:
+    - name: Install Apache and PHP
+      yum:
+        name:
+          - httpd
+          - php
+          - php-mysqlnd
+        state: present
+
+    - name: Create simple PHP page
+      copy:
+        dest: /var/www/html/index.php
+        content: |
+          <?php
+          phpinfo();
+          ?>
+
+    - name: Enable and start Apache
+      systemd:
+        name: httpd
+        enabled: yes
+        state: started
+
+    - name: Allow HTTP traffic in firewall
+      firewalld:
+        port: 80/tcp
+        permanent: yes
+        state: enabled
+      notify: Reload firewall
+
+  handlers:
+    - name: Reload firewall
+      command: firewall-cmd --reload
