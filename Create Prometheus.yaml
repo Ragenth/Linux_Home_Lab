@@ -1,0 +1,49 @@
+---
+- name: Setup Prometheus Node
+  hosts: monitoring
+  become: yes
+  tasks:
+    - name: Create prometheus user
+      user:
+        name: prometheus
+        shell: /sbin/nologin
+
+    - name: Install required packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - wget
+        - tar
+        - firewalld
+
+    - name: Open firewall ports
+      firewalld:
+        port: "{{ item }}/tcp"
+        permanent: yes
+        state: enabled
+      loop:
+        - 9090
+        - 9100
+      notify: Reload firewall
+
+    - name: Copy Prometheus binary
+      copy:
+        src: files/prometheus
+        dest: /usr/local/bin/prometheus
+        mode: '0755'
+
+    - name: Deploy prometheus.yml config
+      template:
+        src: templates/prometheus.yml.j2
+        dest: /etc/prometheus/prometheus.yml
+
+    - name: Enable and start Prometheus service
+      systemd:
+        name: prometheus
+        enabled: yes
+        state: started
+
+  handlers:
+    - name: Reload firewall
+      command: firewall-cmd --reload
