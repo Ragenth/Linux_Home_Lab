@@ -1,0 +1,47 @@
+---
+- name: Setup Percona XtraDB Cluster
+  hosts: db
+  become: yes
+
+  vars:
+    root_db_pass: MyStrongPass
+    cluster_name: mycluster
+    cluster_nodes: "{{ groups['db'] | map('extract', hostvars, 'ansible_host') | list }}"
+
+  tasks:
+    - name: Install Percona repo
+      yum:
+        name: https://repo.percona.com/yum/percona-release-latest.noarch.rpm
+        state: present
+
+    - name: Enable Percona XtraDB repo
+      command: percona-release enable-only ps80
+
+    - name: Install Percona XtraDB Cluster
+      yum:
+        name:
+          - percona-xtradb-cluster
+        state: present
+
+    - name: Configure MySQL for cluster
+      template:
+        src: my.cnf.j2
+        dest: /etc/my.cnf
+        mode: '0644'
+
+    - name: Start and enable MySQL service
+      systemd:
+        name: mysql
+        enabled: yes
+        state: started
+
+    - name: Allow MySQL ports
+      firewalld:
+        port: 3306/tcp
+        permanent: yes
+        state: enabled
+      notify: Reload firewall
+
+  handlers:
+    - name: Reload firewall
+      command: firewall-cmd --reload
