@@ -1,0 +1,33 @@
+---
+- name: Setup HAProxy Load Balancers
+  hosts: lb
+  become: yes
+
+  tasks:
+    - name: Install HAProxy
+      yum:
+        name: haproxy
+        state: present
+
+    - name: Configure HAProxy for web servers
+      template:
+        src: haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+        mode: '0644'
+
+    - name: Enable and start HAProxy
+      systemd:
+        name: haproxy
+        enabled: yes
+        state: started
+
+    - name: Allow HAProxy ports in firewall
+      firewalld:
+        port: 80/tcp
+        permanent: yes
+        state: enabled
+      notify: Reload firewall
+
+  handlers:
+    - name: Reload firewall
+      command: firewall-cmd --reload
