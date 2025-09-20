@@ -1,0 +1,3 @@
+ansible-playbook -i inventory.ini webservers.yml
+ansible-playbook -i inventory.ini loadbalancers.yml
+ansible-playbook -i inventory.ini dbcluster.yml
