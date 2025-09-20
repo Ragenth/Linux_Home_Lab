@@ -1,0 +1,14 @@
+Role	VM name	IP
+RDPClient       RDPClient 192.168.1.9
+Load Balancer	lb1	192.168.1.10 
+Load Balancer	lb2	192.168.1.11 
+Web		web1	192.168.1.21
+Web		web2	192.168.1.22
+Web		web3	192.168.1.23
+DB (Galera)	db1	192.168.1.31
+DB (Galera)	db2	192.168.1.32
+DB (Galera)	db3	192.168.1.33
+Monitoring	mon	192.168.1.50
+Monitoring	mon2	192.168.1.51 
+ 
+VIP (LB virtual IP)	192.168.10.100
