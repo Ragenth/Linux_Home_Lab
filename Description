@@ -1,0 +1,13 @@
+🏗️ Lab Overview
+
+RDPClient → Windows/Linux machine to test web/db access
+
+LB1/LB2 → HAProxy/Keepalived for load balancing web traffic
+
+Web1/2/3 → Apache/Nginx hosting a sample app (like a PHP app)
+
+DB1/2/3 → MySQL-compatible HA DB (use Percona XtraDB Cluster instead of MariaDB Galera, as Percona is stable and supported on CentOS Stream 10)
+
+Monitoring → Prometheus + Grafana (or Nagios for simplicity)
+
+VIP → Virtual IP managed by Keepalived for HA
