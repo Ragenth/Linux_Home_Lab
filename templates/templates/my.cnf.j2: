@@ -1,0 +1,16 @@
+[mysqld]
+user=mysql
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+bind-address=0.0.0.0
+
+wsrep_on=ON
+wsrep_provider=/usr/lib64/galera4/libgalera_smm.so
+wsrep_cluster_name={{ cluster_name }}
+wsrep_cluster_address=gcomm://{% for node in cluster_nodes %}{{ node }}{% if not loop.last %},{% endif %}{% endfor %}
+wsrep_node_address={{ ansible_host }}
+wsrep_node_name={{ inventory_hostname }}
+pxc_strict_mode=ENFORCING
+binlog_format=ROW
+default_storage_engine=InnoDB
+innodb_autoinc_lock_mode=2
